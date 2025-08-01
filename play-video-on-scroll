@@ -1,0 +1,54 @@
+<!-- Shopify Section Snippet: Full-Screen Scroll-Scrubbing Video -->
+<div class="custom-video-scroll-trigger-area" id="myVideoScrollArea_snippet">
+    <div class="custom-video-sticky-wrapper">
+        <div class="custom-video-container" id="myVideoPlayerContainer_snippet">
+            <video class="custom-bg-video" id="myBgVideo_snippet" muted playsinline preload="auto">
+                <source src="https://cdn.shopify.com/videos/c/o/v/95cab81572fc47cd8c3486ab390598af.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+</div>
+<style>
+    .custom-video-scroll-trigger-area { height: 200vh; position: relative; }
+    .custom-video-sticky-wrapper { position: sticky; top: 0; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .custom-video-container { width: 100%; height: 100%; overflow: hidden; background-color: #000; }
+    .custom-bg-video { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const video_snippet = document.getElementById('myBgVideo_snippet');
+        const videoScrollArea_snippet = document.getElementById('myVideoScrollArea_snippet');
+        if (!video_snippet || !videoScrollArea_snippet) { console.warn("Scroll-scrubbing video (snippet): Essential elements not found."); return; }
+        let videoDuration_snippet = 0; const interactiveScrubFactor_snippet = 1;
+        video_snippet.pause();
+        video_snippet.addEventListener('loadedmetadata', () => { videoDuration_snippet = video_snippet.duration; handleActiveScroll_snippet(); });
+        video_snippet.addEventListener('play', () => { if (videoDuration_snippet > 0) video_snippet.pause(); });
+        function handleActiveScroll_snippet() {
+            if (!videoScrollArea_snippet || !video_snippet || videoDuration_snippet === 0) {
+                if (video_snippet && video_snippet.readyState >= 1 && videoDuration_snippet === 0) { videoDuration_snippet = video_snippet.duration; }
+                if(videoDuration_snippet === 0) return;
+            }
+            const scrollAreaRect_snippet = videoScrollArea_snippet.getBoundingClientRect(); const viewportHeight_snippet = window.innerHeight;
+            const interactiveScrubDistance_snippet = viewportHeight_snippet * interactiveScrubFactor_snippet;
+            const pixelsScrolledPastActivation_snippet = Math.max(0, -scrollAreaRect_snippet.top);
+            let progress_snippet = 0; let shouldBeScrubbing_snippet = false;
+            if (scrollAreaRect_snippet.top <= 0 && scrollAreaRect_snippet.bottom > 0) {
+                shouldBeScrubbing_snippet = true; progress_snippet = pixelsScrolledPastActivation_snippet / interactiveScrubDistance_snippet;
+                progress_snippet = Math.max(0, Math.min(1, progress_snippet));
+            } else if (scrollAreaRect_snippet.top > 0) {
+                shouldBeScrubbing_snippet = false; progress_snippet = 0;
+            } else { shouldBeScrubbing_snippet = false; progress_snippet = 1; }
+            if (shouldBeScrubbing_snippet || video_snippet.currentTime !== progress_snippet * videoDuration_snippet) {
+                if (!video_snippet.paused) video_snippet.pause();
+                const newTime_snippet = progress_snippet * videoDuration_snippet;
+                if (Math.abs(video_snippet.currentTime - newTime_snippet) > 0.01 && !video_snippet.seeking) {
+                    video_snippet.currentTime = newTime_snippet;
+                }
+            }
+        }
+        window.addEventListener('scroll', handleActiveScroll_snippet, { passive: true });
+        window.addEventListener('resize', () => { if (videoDuration_snippet > 0) handleActiveScroll_snippet(); });
+        handleActiveScroll_snippet();
+    });
+</script>
